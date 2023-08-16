@@ -50,11 +50,8 @@ func main() {
 	app.Post("/chat", handlers.SaveChat)
 	// 스트리머 이름을 전송받아, 해당 스트리머의 방송 화면을 전송함.
 	app.Get("/screen/:streamer", handlers.GetStreamCapture)
-	// 이미지 파일을 리사이징하여 제공함.
-	// app.Get("/image/:streamer/width::width/height::height", handlers.ResizeImage)
 	// 정적 이미지 파일을 제공함.
 	app.Static("/static/image", "./static")
-	app.Static("/static/resize", "./static/resize")
 
 	/* Server Start */
 	err = app.Listen(fmt.Sprintf(":%s", utils.Environment("API_PORT")))
