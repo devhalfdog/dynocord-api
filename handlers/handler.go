@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/devhalfdog/dynocord-api/database"
 	e "github.com/devhalfdog/dynocord-api/errors"
@@ -56,19 +57,35 @@ func GetStreamCapture(ctx *fiber.Ctx) error {
 		})
 	}
 
-	// imageName := strings.Split(file, string(os.PathSeparator))
-	imgUrl, err := UploadImage(file, streamer)
-	if err != nil {
+	imgCh := make(chan string, 1)
+	errCh := make(chan error, 1)
+	go func() {
+		imgUrl, err := UploadImage(file, streamer)
+		if err != nil {
+			errCh <- err
+			return
+		}
+
+		imgCh <- imgUrl
+	}()
+
+	select {
+	case imgUrl := <-imgCh:
+		return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{
+			"error":   false,
+			"message": imgUrl,
+		})
+	case err := <-errCh:
 		return ctx.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"error":   true,
-			"message": "failed image upload",
+			"message": fmt.Sprintf("failed upload image : %v", err),
+		})
+	case <-time.After(10 * time.Second):
+		return ctx.Status(fiber.StatusRequestTimeout).JSON(fiber.Map{
+			"error":   true,
+			"message": "image upload took too long",
 		})
 	}
-
-	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"error":   false,
-		"message": imgUrl,
-	})
 }
 
 // 이미지 리사이즈
