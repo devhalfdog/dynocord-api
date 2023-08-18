@@ -53,6 +53,7 @@ func GetStreamScreenShot(channel string) (string, error) {
 	}
 
 	dlc := make(chan *Segment, 1)
+	defer close(dlc)
 
 	go getPlaylist(channel, url, dlc)
 	go downloadSegment(path, dlc)
@@ -68,8 +69,6 @@ func GetStreamScreenShot(channel string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	close(dlc)
 
 	// file remove
 	err = os.Remove(path)
