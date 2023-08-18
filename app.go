@@ -14,10 +14,10 @@ import (
 
 func main() {
 	/* Handlers Initial */
-	err := handlers.Initial()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err := handlers.Initial()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	/* Fiber Instance Create */
 	app := fiber.New(fiber.Config{})
@@ -42,19 +42,19 @@ func main() {
 	})
 
 	/* Route */
-	// 스트리머 채팅 최근 10개를 불러옴.
-	app.Get("/chat/:streamer", handlers.GetChat)
-	// 스트리머 채팅을 before 기준으로 최근 10개를 가져옴.
-	app.Get("/chat/:streamer/before::before<int>", handlers.GetChat)
-	// 스트리머 채팅을 전송받음.
-	app.Post("/chat", handlers.SaveChat)
+	// // 스트리머 채팅 최근 10개를 불러옴.
+	// app.Get("/chat/:streamer", handlers.GetChat)
+	// // 스트리머 채팅을 before 기준으로 최근 10개를 가져옴.
+	// app.Get("/chat/:streamer/before::before<int>", handlers.GetChat)
+	// // 스트리머 채팅을 전송받음.
+	// app.Post("/chat", handlers.SaveChat)
 	// 스트리머 이름을 전송받아, 해당 스트리머의 방송 화면을 전송함.
 	app.Get("/screen/:streamer", handlers.GetStreamCapture)
 	// 정적 이미지 파일을 제공함.
 	app.Static("/static/image", "./static")
 
 	/* Server Start */
-	err = app.Listen(fmt.Sprintf(":%s", utils.Environment("API_PORT")))
+	err := app.Listen(fmt.Sprintf(":%s", utils.Environment("API_PORT")))
 
 	if err != nil {
 		log.Fatal(err)
